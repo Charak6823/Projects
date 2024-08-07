@@ -1,0 +1,154 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container mt-3">
+  <div class="card border-primary mb-3" style="min-height: 50vh;">
+    <div class="card-header">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="openModal();">
+        បញ្ចូលបន្ទប់
+      </button>
+    </div>
+    <div class="card-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">លេខបន្ទប់</th>
+            <th scope="col">ប្រភេទ</th>
+            <th scope="col">កំណត់ចំណាំ</th>
+            <th scope="col">សកម្មភាព</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for room in rooms %}
+          <tr class="table-active">
+            <td>{{ room.room_number }}</td>
+            <td>{{ room.room_type.name_kh }}</td>
+            <td>{{ room.description }}</td>
+            <td>
+              <span class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="openModal('{{ room.id }}', '{{ room.room_type.id }}', '{{ room.room_number }}', '{{ room.description }}', 'view');"><i class="fa-solid fa-eye"></i></span>
+              <span class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="openModal('{{ room.id }}', '{{ room.room_type.id }}', '{{ room.room_number }}', '{{ room.description }}', 'update');"><i class="fa-solid fa-pen-to-square"></i></span>
+              <span class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="openModal('{{ room.id }}', '{{ room.room_type.id }}', '{{ room.room_number }}', '{{ room.description }}', 'delete');"><i class="fa-solid fa-trash"></i></span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="roomModal" tabindex="-1" aria-labelledby="roomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="roomModalLabel">បញ្ចូលបន្ទប់ថ្មី</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form role="form" method="POST" action="{% url 'save_room' %}">
+                {% csrf_token %}
+                <input type="hidden" id="action" name="action">
+                <input type="hidden" id="room_id" name="room_id">
+            
+                <div>
+                    <label for="room_type_id" class="form-label mt-4">ប្រភេទ</label>
+                    <select class="form-control" id="room_type_id" name="room_type_id">
+                        {% for room_type in room_types %}
+                        <option value="{{ room_type.room_type_id }}">{{ room_type.name_kh }}</option>
+                        {% endfor %}
+                      </select>
+                      
+                </div>
+                <div>
+                    <label for="room_number" class="form-label mt-4">លេខបន្ទប់</label>
+                    <input type="text" class="form-control" id="room_number" name="room_number" placeholder="លេខបន្ទប់">
+                </div>
+                <div>
+                    <label for="description" class="form-label mt-4">កំណត់ចំណាំ</label>
+                    <textarea class="form-control" id="description" name="description" placeholder="កំណត់ចំណាំ"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="saveButton" onclick="setAction('create')">Save</button>
+                    <button type="submit" class="btn btn-primary" id="updateButton" style="display: none;" onclick="setAction('update')">Update</button>
+                    <button type="submit" class="btn btn-danger" id="deleteButton" style="display: none;" onclick="setAction('delete')">Delete</button>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+          <div class="toast-header">
+            <strong class="me-auto">{{ message.tags|capfirst }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('.toast').toast('show');
+  });
+
+  function openModal(id='', room_type_id='', room_number='', description='', action='create') {
+    $('#room_id').val(id);  // Set hidden input for room ID
+    $('#room_type_id').val(room_type_id);  // Set room type ID
+    $('#room_number').val(room_number);  // Pre-fill room number
+    $('#description').val(description);  // Pre-fill description
+  
+    // Toggle buttons based on action
+    if (action === 'delete') {
+      $('#action').val('delete');
+      $('#saveButton').hide();
+      $('#updateButton').hide();
+      $('#deleteButton').show();
+      $('#roomModalLabel').text('លុបបន្ទប់');
+    } else if (action === 'update') {
+      $('#room_type_id').prop('disabled',false);
+      $('#room_number').prop('readonly',false);
+      $('#description').prop('readonly',false);
+      $('#action').val('update');
+      $('#saveButton').hide();
+      $('#updateButton').show();
+      $('#deleteButton').hide();
+      $('#roomModalLabel').text('កែប្រែពត៌មានបន្ទប់');
+    } else if (action === 'view') {
+      $('#action').val('view');
+      $('#room_type_id').prop('disabled',true);
+      $('#room_number').prop('readonly',true);
+      $('#description').prop('readonly',true);
+      $('#saveButton').hide();
+      $('#updateButton').hide();
+      $('#deleteButton').hide();
+      $('#roomModalLabel').text('ពត៌មានបន្ទប់');
+    } else {
+      $('#action').val('create');
+      $('#room_type_id').prop('disabled',false);
+      $('#room_number').prop('readonly',false);
+      $('#description').prop('readonly',false);
+      $('#saveButton').show();
+      $('#updateButton').hide();
+      $('#deleteButton').hide();
+      $('#roomModalLabel').text('បញ្ជូលបន្ទប់ថ្មី');
+    }
+  }
+  
+  // Function to set the action for form submission
+  function setAction(action) {
+    $('#action').val(action);
+  }
+</script>
+{% endblock %}

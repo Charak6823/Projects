@@ -1,0 +1,20 @@
+Step 1: Setup a virtual Environment
+	1. Navigate to the directory where you want to create your project
+	2. Crete a virtual environment
+	   #python -m venv myvenv
+	3. Activate the virtual environment
+	   linxu or mac
+	   #source /myenv/bin/activate
+	   Window
+	   #myenv\Scripts\activate
+Step 2: Install Django
+	#pip install django
+Step 3: Create your Django Project
+	#django-admin startproject project_name
+	#cd project_name
+Step 4: Create Django App
+	#python manage.py startapp app
+Step 5: Config the project setting
+	Open project_name/setting.py then add your app to the 'INSTALLED_APPS' list.
+Step 6: Define model
+Step 7: Apply migrations

@@ -1,0 +1,24 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:Projects}/apartment_management_system/db.sqlite3",
+            "name": "apartment db"
+        }
+    ],
+    "cSpell.words": [
+        "កែប្រែទិន្នន័យដោយជោជ័យ",
+        "កែប្រែប្រភេទបន្ទប់",
+        "ទំព័រដើម",
+        "បង្កើតដោយជោគជ័យ",
+        "បញ្ចូលថ្មី",
+        "បញ្ចូលប្រភេទបន្ទប់",
+        "ប្រភេទបន្ទប់",
+        "មើលប្រភេទបន្ទប់",
+        "លុបទិន្នន័យដោយជោគជ័យ",
+        "លុបប្រភេទបន្ទប់",
+        "លេខសំគាល់"
+    ]
+}
